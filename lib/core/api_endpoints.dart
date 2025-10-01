@@ -1,0 +1,1 @@
+const String pokemonBaseUrl = 'https://api.pokemontcg.io/v2';
