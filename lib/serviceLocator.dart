@@ -1,17 +1,18 @@
 import 'package:get_it/get_it.dart';
-import 'package:pokemon_collector/core/api_endpoints.dart';
-import 'package:pokemon_collector/core/network_client.dart';
-import 'package:pokemon_collector/core/network_service.dart';
 import 'package:pokemon_collector/features/pokemons/domain/pokemonRepository.dart';
 import 'package:pokemon_collector/features/pokemons/presentation/viewModels/pokemonScreenViewModel.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:pokemon_tcg/pokemon_tcg.dart';
+import 'package:pokemon_collector/features/pokemons/data/pokemonRemoteDataSource.dart';
 
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  getIt.registerLazySingleton(() => NetworkClient(baseUrl: pokemonBaseUrl));
-  getIt.registerLazySingleton(() => NetworkService(client: getIt<NetworkClient>()));
+  final apiKey = dotenv.env['POKEMON_TCG_API_KEY'] ?? '';
+  getIt.registerLazySingleton(() => PokemonTcgApi(apiKey: apiKey));
+  getIt.registerLazySingleton(() => PokemonRemoteDataSource(api: getIt<PokemonTcgApi>()));
 
-  getIt.registerLazySingleton(() => PokemonRepository(service: getIt<NetworkService>()));
+  getIt.registerLazySingleton(() => PokemonRepository(remoteDataSource: getIt<PokemonRemoteDataSource>()));
   getIt.registerFactory(() => PokemonViewModel(repository: getIt<PokemonRepository>()));
 
 }

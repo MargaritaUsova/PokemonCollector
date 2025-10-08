@@ -13,7 +13,6 @@ Pokemon _$PokemonFromJson(Map<String, dynamic> json) => Pokemon(
   subtypesList: (json['subtypesList'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
-  level: json['level'] as String,
   hp: json['hp'] as String,
   abilities: (json['abilities'] as List<dynamic>)
       .map((e) => PokemonAbility.fromJson(e as Map<String, dynamic>))
@@ -21,6 +20,7 @@ Pokemon _$PokemonFromJson(Map<String, dynamic> json) => Pokemon(
   pokemonAttacks: (json['pokemonAttacks'] as List<dynamic>)
       .map((e) => PokemonAttacks.fromJson(e as Map<String, dynamic>))
       .toList(),
+  imageUrl: json['imageUrl'] as String,
 );
 
 Map<String, dynamic> _$PokemonToJson(Pokemon instance) => <String, dynamic>{
@@ -28,8 +28,8 @@ Map<String, dynamic> _$PokemonToJson(Pokemon instance) => <String, dynamic>{
   'name': instance.name,
   'supertype': instance.supertype,
   'subtypesList': instance.subtypesList,
-  'level': instance.level,
   'hp': instance.hp,
   'abilities': instance.abilities,
   'pokemonAttacks': instance.pokemonAttacks,
+  'imageUrl': instance.imageUrl,
 };

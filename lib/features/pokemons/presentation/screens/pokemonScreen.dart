@@ -34,6 +34,12 @@ class Pokemonscreen extends StatelessWidget {
         itemBuilder: (_, index) {
           final pokemon = viewModel.pokemons[index];
           return ListTile(
+            leading: Image.network(
+              pokemon.imageUrl,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
             title: Text(pokemon.name),
             subtitle: Text('HP: ${pokemon.hp}'),
           );

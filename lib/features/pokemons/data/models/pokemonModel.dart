@@ -14,24 +14,24 @@ class Pokemon {
   final String supertype;
   // A list of subtypes, such as Basic, EX, Mega, Rapid Strike, etc.
   final List<String> subtypesList;
-  // The level of the card. This only pertains to cards from older sets and those of supertype Pokémon.
-  final String level;
   // The hit points of the card.
   final String hp;
   // A list of subtypes, such as Basic, EX, Mega, Rapid Strike, etc.
   final List<PokemonAbility> abilities;
   // One or more attacks for a given card.
   final List<PokemonAttacks> pokemonAttacks;
+  // The image url of the card.
+  final String imageUrl;
 
   Pokemon({
     required this.id,
     required this.name,
     required this.supertype,
     required this.subtypesList,
-    required this.level,
     required this.hp,
     required this.abilities,
     required this.pokemonAttacks,
+    required this.imageUrl
   });
 
   factory Pokemon.fromJson(Map<String, dynamic> json) =>
