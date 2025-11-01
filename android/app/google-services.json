@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "190333573693",
+    "project_id": "pokemoncollector-73859",
+    "storage_bucket": "pokemoncollector-73859.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190333573693:android:8e0ca05202e7a6d0152854",
+        "android_client_info": {
+          "package_name": "com.margaritaUsova.pokemon_collector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "190333573693-ku5bfrooiet8281jl071if5im6vitjjn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.margaritaUsova.pokemon_collector",
+            "certificate_hash": "705ec5e8b2b5dd6042178c1734e300981d6e7af0"
+          }
+        },
+        {
+          "client_id": "190333573693-3h15d9kmsgd4vpub3h4gdhos2sn4imq9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCXGP9Qnew1LKiMl6wDyO_UrGI8Jlgw40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "190333573693-3h15d9kmsgd4vpub3h4gdhos2sn4imq9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "190333573693-hmqoi5de83lvrtgh3ftfvr9v6r454kl6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.margaritaUsova.pokemonCollector"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

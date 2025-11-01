@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokemon_collector/features/auth/presentation/viewModels/authViewModel.dart';
 import 'package:pokemon_collector/features/pokemons/presentation/viewModels/pokemonScreenViewModel.dart';
 import 'package:provider/provider.dart';
 
@@ -7,9 +8,17 @@ class Pokemonscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<PokemonViewModel>();
+    final authVM = context.watch<AuthViewModel>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        leading: IconButton(
+          icon: const Icon(Icons.person_pin),
+          tooltip: 'Menu Icon',
+          onPressed: () {
+            
+          },
+        ),
       ),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -47,7 +56,7 @@ class Pokemonscreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          viewModel.loadPokemons();
+          authVM.signOut();
         },
         child: const Icon(Icons.add_circle),
       ),

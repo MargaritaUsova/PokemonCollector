@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:pokemon_collector/features/pokemons/domain/pokemonRepository.dart';
 import 'package:pokemon_collector/features/pokemons/presentation/viewModels/pokemonScreenViewModel.dart';
+import 'package:pokemon_collector/features/auth/presentation/viewModels/authViewModel.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pokemon_tcg/pokemon_tcg.dart';
 import 'package:pokemon_collector/features/pokemons/data/pokemonRemoteDataSource.dart';
@@ -14,5 +15,6 @@ void setupDependencies() {
 
   getIt.registerLazySingleton(() => PokemonRepository(remoteDataSource: getIt<PokemonRemoteDataSource>()));
   getIt.registerFactory(() => PokemonViewModel(repository: getIt<PokemonRepository>()));
+  getIt.registerFactory(() => AuthViewModel());
 
 }
