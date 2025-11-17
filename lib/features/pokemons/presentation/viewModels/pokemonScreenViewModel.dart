@@ -1,41 +1,67 @@
 import 'package:flutter/cupertino.dart';
 import 'package:pokemon_collector/features/pokemons/data/models/pokemonModel.dart';
 import 'package:pokemon_collector/features/pokemons/domain/pokemonRepository.dart';
-import 'package:pokemon_tcg/pokemon_tcg.dart';
+import 'dart:math';
 
 class PokemonViewModel extends ChangeNotifier {
   final PokemonRepository repository;
+
+  Pokemon? randomPokemon;
+  String? randomPokemonImageUrl;
+
   List<Pokemon> pokemons = [];
-  List<CardSet> sets = [];
   List<String> types = [];
-  List<String> subtypes = [];
-  List<String> supertypes = [];
-  List<String> rarities = [];
-  bool isLoading = false;
+
+  bool isLoadingRandom = false;
+  bool isLoadingList = false;
   String? error;
 
   PokemonViewModel({required this.repository});
 
-  /// Загрузить карты
+  /// Загрузить случайного покемона
+  Future<void> loadRandomPokemon() async {
+    isLoadingRandom = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final pokemon = await repository.getRandomPokemon();
+      
+      if (pokemon != null) {
+        randomPokemon = pokemon;
+        randomPokemonImageUrl = randomPokemon!.imageUrl;
+      } else {
+        error = 'Не удалось загрузить покемона.';
+      }
+    } catch (e, stackTrace) {
+      error = 'Ошибка загрузки: $e';
+      print('Error loading random pokemon: $e');
+    } finally {
+      isLoadingRandom = false;
+      notifyListeners();
+    }
+  }
+
+  /// Загрузить список покемонов
   Future<void> loadPokemons({int pageSize = 20}) async {
-    isLoading = true;
+    isLoadingList = true;
     error = null;
     notifyListeners();
 
     try {
       pokemons = await repository.getPokemons(pageSize: pageSize);
     } catch (e) {
-      error = e.toString();
+      error = 'Ошибка загрузки: $e';
     } finally {
-      isLoading = false;
+      isLoadingList = false;
       notifyListeners();
     }
   }
 
-  /// Получить конкретную карту
-  Future<Pokemon?> getCard(String cardId) async {
+  /// Получить одного покемона по ID
+  Future<Pokemon?> getPokemonById(String id) async {
     try {
-      return await repository.getCard(cardId);
+      return await repository.getPokemonById(id);
     } catch (e) {
       error = e.toString();
       notifyListeners();
@@ -43,71 +69,29 @@ class PokemonViewModel extends ChangeNotifier {
     }
   }
 
-  /// Получить карты из набора
-  Future<void> loadCardsForSet(String setId) async {
-    isLoading = true;
-    error = null;
+  /// Сброс состояния случайного покемона
+  void resetRandomPokemon() {
+    randomPokemon = null;
+    randomPokemonImageUrl = null;
+    isLoadingRandom = false;
     notifyListeners();
-
-    try {
-      pokemons = await repository.getCardsForSet(setId);
-    } catch (e) {
-      error = e.toString();
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
   }
 
-  /// Загрузить наборы
-  Future<void> loadSets() async {
-    try {
-      sets = await repository.getSets();
-      notifyListeners();
-    } catch (e) {
-      error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  /// Загрузить метаданные (типы, подтипы, редкости)
-  Future<void> loadMetadata() async {
-    try {
-      final futures = await Future.wait([
-        repository.getTypes(),
-        repository.getSubtypes(),
-        repository.getSupertypes(),
-        repository.getRarities(),
-      ]);
-      
-      types = futures[0];
-      subtypes = futures[1];
-      supertypes = futures[2];
-      rarities = futures[3];
-      
-      notifyListeners();
-    } catch (e) {
-      error = e.toString();
-      notifyListeners();
-    }
+  /// Полный сброс состояния
+  void reset() {
+    randomPokemon = null;
+    randomPokemonImageUrl = null;
+    pokemons.clear();
+    types.clear();
+    error = null;
+    isLoadingRandom = false;
+    isLoadingList = false;
+    notifyListeners();
   }
 
   /// Очистить ошибку
   void clearError() {
     error = null;
-    notifyListeners();
-  }
-
-  /// Сбросить состояние
-  void reset() {
-    pokemons.clear();
-    sets.clear();
-    types.clear();
-    subtypes.clear();
-    supertypes.clear();
-    rarities.clear();
-    error = null;
-    isLoading = false;
     notifyListeners();
   }
 }

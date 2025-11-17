@@ -11,7 +11,7 @@ final getIt = GetIt.instance;
 void setupDependencies() {
   final apiKey = dotenv.env['POKEMON_TCG_API_KEY'] ?? '';
   getIt.registerLazySingleton(() => PokemonTcgApi(apiKey: apiKey));
-  getIt.registerLazySingleton(() => PokemonRemoteDataSource(api: getIt<PokemonTcgApi>()));
+  getIt.registerLazySingleton(() => PokemonRemoteDataSource());
 
   getIt.registerLazySingleton(() => PokemonRepository(remoteDataSource: getIt<PokemonRemoteDataSource>()));
   getIt.registerFactory(() => PokemonViewModel(repository: getIt<PokemonRepository>()));

@@ -1,54 +1,61 @@
 import 'package:pokemon_collector/features/pokemons/data/models/pokemonModel.dart';
 import 'package:pokemon_collector/features/pokemons/data/pokemonRemoteDataSource.dart';
-import 'package:pokemon_tcg/pokemon_tcg.dart';
 
 class PokemonRepository {
   final PokemonRemoteDataSource remoteDataSource;
 
   PokemonRepository({required this.remoteDataSource});
 
-  /// Получить список карт
-  Future<List<Pokemon>> getPokemons({int pageSize = 20}) {
-    return remoteDataSource.getPokemons(pageSize: pageSize);
+  List<Pokemon>? _cachedPokemons;
+  DateTime? _cacheTime;
+  final Duration _cacheDuration = Duration(minutes: 5);
+
+  bool get _isCacheValid {
+    if (_cachedPokemons == null || _cacheTime == null) return false;
+    return DateTime.now().difference(_cacheTime!) < _cacheDuration;
   }
 
-  /// Получить конкретную карту по ID
-  Future<Pokemon?> getCard(String cardId) {
-    return remoteDataSource.getCard(cardId);
+  Future<List<Pokemon>> getPokemons({int pageSize = 20, int offset = 0}) async {
+    if (_isCacheValid && _cachedPokemons != null && offset == 0) {
+      return _cachedPokemons!;
+    }
+
+    try {
+      final pokemons = await remoteDataSource.getPokemons(pageSize: pageSize, offset: offset);
+      if (offset == 0) {
+        _cachedPokemons = pokemons;
+        _cacheTime = DateTime.now();
+      }
+      return pokemons;
+    } catch (e) {
+      print('Error fetching pokemons: $e');
+      return [];
+    }
   }
 
-  /// Получить карты из конкретного набора
-  Future<List<Pokemon>> getCardsForSet(String setId) {
-    return remoteDataSource.getCardsForSet(setId);
+  /// Получить случайного покемона
+  Future<Pokemon?> getRandomPokemon() async {
+    try {
+      return await remoteDataSource.getRandomPokemon();
+    } catch (e, stackTrace) {
+      print('Error fetching random pokemon: $e');
+      return null;
+    }
   }
 
-  /// Получить все наборы
-  Future<List<CardSet>> getSets() {
-    return remoteDataSource.getSets();
+  /// Очистить кеш
+  void clearCache() {
+    _cachedPokemons = null;
+    _cacheTime = null;
   }
 
-  /// Получить конкретный набор
-  Future<CardSet?> getSet(String setId) {
-    return remoteDataSource.getSet(setId);
+  /// Получить одного покемона по ID
+  Future<Pokemon?> getPokemonById(String id) {
+    return remoteDataSource.getPokemonById(id);
   }
 
-  /// Получить типы карт
+  /// Получить типы покемонов
   Future<List<String>> getTypes() {
     return remoteDataSource.getTypes();
-  }
-
-  /// Получить подтипы карт
-  Future<List<String>> getSubtypes() {
-    return remoteDataSource.getSubtypes();
-  }
-
-  /// Получить супертипы карт
-  Future<List<String>> getSupertypes() {
-    return remoteDataSource.getSupertypes();
-  }
-
-  /// Получить редкости карт
-  Future<List<String>> getRarities() {
-    return remoteDataSource.getRarities();
   }
 }

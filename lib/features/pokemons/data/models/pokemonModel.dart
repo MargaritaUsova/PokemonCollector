@@ -1,41 +1,138 @@
 import 'package:pokemon_collector/features/pokemons/data/models/pokemonAbility.dart';
 import 'package:pokemon_collector/features/pokemons/data/models/pokemonAttacks.dart';
-import 'package:json_annotation/json_annotation.dart';
 
-part 'pokemonModel.g.dart';
+import 'PokemonStat.dart';
 
-@JsonSerializable()
 class Pokemon {
-  // Unique identifier for the object.
-  final String id;
-  // The name of the card.
+  final int id;
   final String name;
-  // The supertype of the card, such as Pokémon, Energy, or Trainer.
-  final String supertype;
-  // A list of subtypes, such as Basic, EX, Mega, Rapid Strike, etc.
-  final List<String> subtypesList;
-  // The hit points of the card.
-  final String hp;
-  // A list of subtypes, such as Basic, EX, Mega, Rapid Strike, etc.
+  final int height;
+  final int weight;
+  final List<String> types;
   final List<PokemonAbility> abilities;
-  // One or more attacks for a given card.
-  final List<PokemonAttacks> pokemonAttacks;
-  // The image url of the card.
+  final List<PokemonMove> moves;
+  final Map<String, dynamic> sprites;
+  final List<PokemonStat> stats;
   final String imageUrl;
+  final String category; // по типу покемона (Fire, Water и т.д.)
+  final String rarity; // редкость на основе base_experience
 
   Pokemon({
     required this.id,
     required this.name,
-    required this.supertype,
-    required this.subtypesList,
-    required this.hp,
+    required this.height,
+    required this.weight,
+    required this.types,
     required this.abilities,
-    required this.pokemonAttacks,
-    required this.imageUrl
+    required this.moves,
+    required this.sprites,
+    required this.stats,
+    required this.imageUrl,
+    required this.category,
+    required this.rarity,
   });
 
-  factory Pokemon.fromJson(Map<String, dynamic> json) =>
-      _$PokemonFromJson(json);
-
-  Map<String, dynamic> toJson() => _$PokemonToJson(this);
+  factory Pokemon.fromJson(Map<String, dynamic> json) {
+    try {
+      final sprites = Map<String, dynamic>.from(json['sprites'] ?? {});
+      
+      // Безопасное получение URL изображения
+      String imageUrl = '';
+      try {
+        final other = sprites['other'] as Map<String, dynamic>?;
+        if (other != null) {
+          final officialArtwork = other['official-artwork'] as Map<String, dynamic>?;
+          if (officialArtwork != null && officialArtwork['front_default'] != null) {
+            imageUrl = officialArtwork['front_default'] as String;
+          }
+        }
+        if (imageUrl.isEmpty && sprites['front_default'] != null) {
+          imageUrl = sprites['front_default'] as String;
+        }
+      } catch (e) {
+        print('Error parsing image URL: $e');
+      }
+      
+      // Определение категории (первый тип покемона)
+      final typesList = (json['types'] as List? ?? [])
+          .map((t) {
+            try {
+              return (t['type']?['name'] ?? '') as String;
+            } catch (e) {
+              return '';
+            }
+          })
+          .where((t) => t.isNotEmpty)
+          .toList();
+      final category = typesList.isNotEmpty 
+          ? (typesList[0].length > 1 
+              ? typesList[0].substring(0, 1).toUpperCase() + typesList[0].substring(1)
+              : typesList[0].toUpperCase())
+          : 'Unknown';
+      
+      // Определение редкости на основе base_experience
+      final baseExperience = json['base_experience'] as int? ?? 0;
+      String rarity;
+      if (baseExperience >= 300) {
+        rarity = 'Legendary';
+      } else if (baseExperience >= 200) {
+        rarity = 'Rare';
+      } else if (baseExperience >= 100) {
+        rarity = 'Uncommon';
+      } else {
+        rarity = 'Common';
+      }
+      
+      return Pokemon(
+          id: json['id'] as int? ?? 0,
+          name: (json['name'] as String?) ?? 'Unknown',
+          height: json['height'] as int? ?? 0,
+          weight: json['weight'] as int? ?? 0,
+          types: typesList,
+          abilities: (json['abilities'] as List? ?? [])
+              .map((a) {
+                try {
+                  return PokemonAbility.fromJson(a as Map<String, dynamic>);
+                } catch (e) {
+                  print('Error parsing ability: $e');
+                  return null;
+                }
+              })
+              .whereType<PokemonAbility>()
+              .toList(),
+          moves: (json['moves'] as List? ?? [])
+              .map((m) {
+                try {
+                  return PokemonMove.fromJson(m as Map<String, dynamic>);
+                } catch (e) {
+                  print('Error parsing move: $e');
+                  return null;
+                }
+              })
+              .whereType<PokemonMove>()
+              .toList(),
+          sprites: sprites,
+          stats: (json['stats'] as List? ?? [])
+              .map((s) {
+                try {
+                  return PokemonStat.fromJson(s as Map<String, dynamic>);
+                } catch (e) {
+                  print('Error parsing stat: $e');
+                  return null;
+                }
+              })
+              .whereType<PokemonStat>()
+              .toList(),
+          imageUrl: imageUrl,
+          category: category,
+          rarity: rarity
+      );
+    } catch (e, stackTrace) {
+      print('Error parsing Pokemon from JSON: $e');
+      print('Stack trace: $stackTrace');
+      print('JSON keys: ${json.keys.toList()}');
+      rethrow;
+    }
+  }
 }
+

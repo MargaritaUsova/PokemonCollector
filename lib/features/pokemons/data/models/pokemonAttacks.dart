@@ -1,25 +1,24 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'pokemonAttacks.g.dart';
-
-@JsonSerializable()
-class PokemonAttacks {
-  final List<String> cost;
+class PokemonMove {
   final String name;
-  final String text;
-  final String damage;
-  final int convertedEnergyCost;
+  final String url;
 
-  PokemonAttacks({
-    required this.cost,
+  PokemonMove({
     required this.name,
-    required this.text,
-    required this.damage,
-    required this.convertedEnergyCost,
+    required this.url,
   });
 
-  factory PokemonAttacks.fromJson(Map<String, dynamic> json) =>
-      _$PokemonAttacksFromJson(json);
+  factory PokemonMove.fromJson(Map<String, dynamic> json) {
+    final moveJson = json['move'] as Map<String, dynamic>? ?? {};
+    return PokemonMove(
+      name: moveJson['name'] ?? '',
+      url: moveJson['url'] ?? '',
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$PokemonAttacksToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'url': url,
+    };
+  }
 }

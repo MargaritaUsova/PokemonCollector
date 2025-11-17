@@ -1,21 +1,19 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'pokemonAbility.g.dart';
-
-@JsonSerializable()
 class PokemonAbility {
   final String name;
-  final String text;
-  final String type;
+  final String url;
+  final bool isHidden;
 
   PokemonAbility({
     required this.name,
-    required this.text,
-    required this.type,
+    required this.url,
+    required this.isHidden,
   });
 
-  factory PokemonAbility.fromJson(Map<String, dynamic> json) =>
-      _$PokemonAbilityFromJson(json);
-
-  Map<String, dynamic> toJson() => _$PokemonAbilityToJson(this);
+  factory PokemonAbility.fromJson(Map<String, dynamic> json) {
+    return PokemonAbility(
+      name: json['ability']['name'] ?? '',
+      url: json['ability']['url'] ?? '',
+      isHidden: json['is_hidden'] ?? false,
+    );
+  }
 }

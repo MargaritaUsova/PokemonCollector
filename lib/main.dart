@@ -55,7 +55,7 @@ class AuthWrapper extends StatelessWidget {
         }
         
         if (snapshot.hasData && snapshot.data != null) {
-          return Pokemonscreen();
+          return PokemonScreen();
         } else {
           return const AuthScreen();
         }

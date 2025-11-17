@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pokemon_collector/features/auth/data/services/google_sign_in_service.dart';
@@ -34,15 +35,16 @@ class AuthViewModel extends ChangeNotifier {
       
       if (user != null) {
         _currentUser = user;
-        // final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
-        // await userDoc.set({
-        //   'userId': user.uid,
-        //   'email': user.email,
-        //   'displayName': user.displayName,
-        //   'lastCardReceived': FieldValue.serverTimestamp(),
-        //   'cards': [],
-        //   'friends': [],
-        // }, SetOptions(merge: true));
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        if (firebaseUser == null) {
+          throw Exception('Пользователь не авторизован в FirebaseAuth');
+        }
+        final userDoc = FirebaseFirestore.instance.collection('users').doc(firebaseUser.uid);
+        await userDoc.set({
+          'userId': firebaseUser.uid,
+          'email': firebaseUser.email,
+          'displayName': firebaseUser.displayName,
+        }, SetOptions(merge: true));
         debugPrint('Успешный вход: ${user.displayName} (${user.email})');
       } else {
         _setError('Вход отменен пользователем');
