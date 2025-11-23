@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:pokemon_collector/features/pokemons/data/models/pokemonModel.dart';
 import 'package:pokemon_collector/features/pokemons/domain/pokemonRepository.dart';
-import 'dart:math';
 
 class PokemonViewModel extends ChangeNotifier {
   final PokemonRepository repository;
@@ -26,7 +25,7 @@ class PokemonViewModel extends ChangeNotifier {
 
     try {
       final pokemon = await repository.getRandomPokemon();
-      
+
       if (pokemon != null) {
         randomPokemon = pokemon;
         randomPokemonImageUrl = randomPokemon!.imageUrl;
