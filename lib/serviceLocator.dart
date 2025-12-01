@@ -1,20 +1,21 @@
 import 'package:get_it/get_it.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pokemon_collector/features/pokemons/domain/pokemonRepository.dart';
 import 'package:pokemon_collector/features/pokemons/presentation/viewModels/pokemonScreenViewModel.dart';
-import 'package:pokemon_collector/features/auth/presentation/viewModels/authViewModel.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:pokemon_tcg/pokemon_tcg.dart';
 import 'package:pokemon_collector/features/pokemons/data/pokemonRemoteDataSource.dart';
+import 'package:pokemon_collector/features/auth/presentation/viewModels/auth_view_model.dart';
+import 'package:pokemon_collector/features/auth/data/services/google_auth_service.dart';
 
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  final apiKey = dotenv.env['POKEMON_TCG_API_KEY'] ?? '';
-  getIt.registerLazySingleton(() => PokemonTcgApi(apiKey: apiKey));
+  // Pokemon dependencies
   getIt.registerLazySingleton(() => PokemonRemoteDataSource());
-
   getIt.registerLazySingleton(() => PokemonRepository(remoteDataSource: getIt<PokemonRemoteDataSource>()));
   getIt.registerFactory(() => PokemonViewModel(repository: getIt<PokemonRepository>()));
-  getIt.registerFactory(() => AuthViewModel());
 
+  // Auth dependencies
+  getIt.registerLazySingleton(() => FirebaseAuth.instance);
+  getIt.registerLazySingleton(() => GoogleAuthService(getIt<FirebaseAuth>()));
+  getIt.registerFactory(() => AuthViewModel(getIt<GoogleAuthService>()));
 }

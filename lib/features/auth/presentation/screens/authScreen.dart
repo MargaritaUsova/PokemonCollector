@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pokemon_collector/features/auth/presentation/viewModels/authViewModel.dart';
+import '../viewModels/auth_view_model.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({Key? key}) : super(key: key);

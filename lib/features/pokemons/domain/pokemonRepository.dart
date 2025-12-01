@@ -59,3 +59,4 @@ class PokemonRepository {
     return remoteDataSource.getTypes();
   }
 }
+

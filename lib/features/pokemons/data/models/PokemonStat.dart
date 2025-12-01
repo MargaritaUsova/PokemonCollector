@@ -1,7 +1,7 @@
 class PokemonStat {
   final int baseStat; // значение характеристики
-  final int effort; // effort points
-  final String name; // имя характеристики (hp, attack, defense...)
+  final int effort;
+  final String name; // имя характеристики
 
   PokemonStat({
     required this.baseStat,

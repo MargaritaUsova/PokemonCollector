@@ -14,8 +14,8 @@ class Pokemon {
   final Map<String, dynamic> sprites;
   final List<PokemonStat> stats;
   final String imageUrl;
-  final String category; // по типу покемона (Fire, Water и т.д.)
-  final String rarity; // редкость на основе base_experience
+  final String category;
+  final String rarity;
 
   Pokemon({
     required this.id,
@@ -35,8 +35,7 @@ class Pokemon {
   factory Pokemon.fromJson(Map<String, dynamic> json) {
     try {
       final sprites = Map<String, dynamic>.from(json['sprites'] ?? {});
-      
-      // Безопасное получение URL изображения
+
       String imageUrl = '';
       try {
         final other = sprites['other'] as Map<String, dynamic>?;
@@ -52,8 +51,7 @@ class Pokemon {
       } catch (e) {
         print('Error parsing image URL: $e');
       }
-      
-      // Определение категории (первый тип покемона)
+
       final typesList = (json['types'] as List? ?? [])
           .map((t) {
             try {
@@ -69,8 +67,7 @@ class Pokemon {
               ? typesList[0].substring(0, 1).toUpperCase() + typesList[0].substring(1)
               : typesList[0].toUpperCase())
           : 'Unknown';
-      
-      // Определение редкости на основе base_experience
+
       final baseExperience = json['base_experience'] as int? ?? 0;
       String rarity;
       if (baseExperience >= 300) {

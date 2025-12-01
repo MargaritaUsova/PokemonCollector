@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pokemon_collector/features/auth/data/services/google_sign_in_service.dart';
+import 'package:pokemon_collector/features/auth/data/services/google_auth_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
+  final GoogleAuthService _authService;
+
   bool _isLoading = false;
   String? _errorMessage;
   User? _currentUser;
@@ -13,45 +15,43 @@ class AuthViewModel extends ChangeNotifier {
   User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
 
-  AuthViewModel() {
+  AuthViewModel(this._authService) {
     _initializeAuth();
   }
 
   void _initializeAuth() {
-    GoogleSignInService.authStateChanges.listen((User? user) {
+    _authService.authStateChanges.listen((User? user) {
       _currentUser = user;
       notifyListeners();
     });
 
-    _currentUser = GoogleSignInService.currentUser;
+    _currentUser = _authService.currentUser;
   }
 
   Future<void> signInWithGoogle() async {
     try {
       _setLoading(true);
       _clearError();
-      
-      final user = await GoogleSignInService.signInWithGoogle();
-      
+
+      final user = await _authService.signInWithGoogle();
+
       if (user != null) {
         _currentUser = user;
-        final firebaseUser = FirebaseAuth.instance.currentUser;
-        if (firebaseUser == null) {
-          throw Exception('Пользователь не авторизован в FirebaseAuth');
-        }
-        final userDoc = FirebaseFirestore.instance.collection('users').doc(firebaseUser.uid);
+
+        final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
         await userDoc.set({
-          'userId': firebaseUser.uid,
-          'email': firebaseUser.email,
-          'displayName': firebaseUser.displayName,
+          'userId': user.uid,
+          'email': user.email,
+          'displayName': user.displayName,
         }, SetOptions(merge: true));
-        debugPrint('Успешный вход: ${user.displayName} (${user.email})');
+
+        debugPrint('Successful sign in: ${user.displayName} (${user.email})');
       } else {
         _setError('Вход отменен пользователем');
       }
     } catch (e) {
       _setError('Ошибка при входе: ${e.toString()}');
-      debugPrint('Ошибка авторизации: $e');
+      debugPrint('Authentication error: $e');
     } finally {
       _setLoading(false);
     }
@@ -61,14 +61,14 @@ class AuthViewModel extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
-      await GoogleSignInService.signOut();
+
+      await _authService.signOut();
       _currentUser = null;
-      
-      debugPrint('Успешный выход');
+
+      debugPrint('Successful sign out');
     } catch (e) {
       _setError('Ошибка при выходе: ${e.toString()}');
-      debugPrint('Ошибка выхода: $e');
+      debugPrint('Sign out error: $e');
     } finally {
       _setLoading(false);
     }
